@@ -20,11 +20,11 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean package -DskipTests
 
       - if: ${{ github.ref == 'refs/heads/main' }}
         name: Build and Publish Docker image
         run: |
-          ./mvnw clean package jib:dockerBuild -DskipTests
+          mvn clean package jib:dockerBuild -DskipTests
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
           docker push ${{ secrets.DOCKER_USERNAME }}/bookmarker-api 
