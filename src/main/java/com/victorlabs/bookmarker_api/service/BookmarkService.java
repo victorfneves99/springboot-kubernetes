@@ -1,7 +1,6 @@
 package com.victorlabs.bookmarker_api.service;
 
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +8,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.victorlabs.bookmarker_api.domain.Bookmark;
+import com.victorlabs.bookmarker_api.dto.BookmarkDTO;
+import com.victorlabs.bookmarker_api.dto.BookmarksDTO;
+import com.victorlabs.bookmarker_api.mapper.BookmarkMapper;
 import com.victorlabs.bookmarker_api.repository.BookmarkRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,19 @@ public class BookmarkService {
 
   private final BookmarkRepository bookmarkRepository;
 
+  @Autowired
+  private final BookmarkMapper bookmarkMapper;
+
   @Transactional(readOnly = true)
-  public Page<Bookmark> getBookmarks(Integer page, Integer itens) {
+  public BookmarksDTO getBookmarks(Integer page, Integer itens) {
 
-    Pageable pageable = PageRequest.of(page, itens);
+    int pageNo = page < 1 ? 0 : page - 1;
 
-    return bookmarkRepository.findAll(pageable);
+    Pageable pageable = PageRequest.of(pageNo, 10, Sort.by("createdAt").descending());
+
+    BookmarksDTO result = bookmarkMapper.toDto(bookmarkRepository.findBookmarks(pageable));
+
+    return result;
   }
 
 }
