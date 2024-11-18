@@ -1,5 +1,7 @@
 package com.victorlabs.bookmarker_api.service;
 
+import java.time.Instant;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -7,10 +9,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.victorlabs.bookmarker_api.domain.Bookmark;
+import com.victorlabs.bookmarker_api.dto.BookmarkDTO;
 import com.victorlabs.bookmarker_api.dto.BookmarksDTO;
+import com.victorlabs.bookmarker_api.dto.request.CreateBookmarkerRequest;
 import com.victorlabs.bookmarker_api.mapper.BookmarkMapper;
 import com.victorlabs.bookmarker_api.repository.BookmarkRepository;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -44,8 +50,19 @@ public class BookmarkService {
 
     BookmarksDTO result = bookmarkMapper.toDto(bookmarkRepository.searchBookmarks(query, pageable));
 
-    BookmarksDTO resulBookmarksProjection = bookmarkMapper.toBookmarkProjectionFromBookmarksDTO(bookmarkRepository.findByTitleContainsIgnoreCase(query, pageable));
-    
+    BookmarksDTO resulBookmarksProjection = bookmarkMapper
+        .toBookmarkProjectionFromBookmarksDTO(bookmarkRepository.findByTitleContainsIgnoreCase(query, pageable));
+
     return result;
+  }
+
+  public BookmarkDTO createBookmarker(CreateBookmarkerRequest request) {
+
+    Bookmark bookmark = new Bookmark(null, request.title(), request.url(), Instant.now());
+
+    Bookmark savedBookmark = bookmarkRepository.save(bookmark);
+
+    return bookmarkMapper.toDtoCreated(savedBookmark);
+
   }
 }
