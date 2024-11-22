@@ -23,8 +23,7 @@ import lombok.Setter;
 public class Bookmark {
 
   @Id
-  @SequenceGenerator(name = "bm_id_seq_gen", sequenceName = "bm_id_seq")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bm_id_seq_gen")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Column(nullable = false)
