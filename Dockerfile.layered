@@ -1,16 +1,13 @@
-# the firts stage of the build will extract the layers
-FROM eclipse-temurin:17-jre-focal AS build
+
+# Use uma imagem base com suporte a Java 17
+FROM eclipse-temurin:17-jre-focal
+
+# Defina o diretório de trabalho dentro do contêiner
 WORKDIR /app
+
+# Copie o JAR diretamente para o contêiner
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} app.jar
-RUN java -Djarmode=layertools -jar app.jar extract
 
-# the second stage of our build will copy the extracted layers
-FROM eclipse-temurin:17-jre-focal
-WORKDIR /app
-COPY --from=build app/dependencies/ ./
-COPY --from=build app/spring-boot-loader/ ./
-COPY --from=build app/snapshot-dependencies/ ./
-COPY --from=build app/ ./
-ENTRYPOINT [ "java", "org.springframework.boot.loader.JarLauncher" ]
-# ENTRYPOINT ["java", "-jar", "app.jar"]
+# Comando de entrada para executar o aplicativo Java
+ENTRYPOINT ["java", "-jar", "app.jar"]
